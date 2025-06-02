@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  server-1:
+    build: ./server_1
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    container_name: node-http-server-1
+    networks:
+      - app-network
+
+  server-2:
+    build: ./server_2
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+    container_name: node-http-server-2
+    networks:
+      - app-network
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - server-1
+      - server-2
+    restart: unless-stopped
+    container_name: nginx-load-balancer
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
